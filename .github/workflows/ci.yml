@@ -30,22 +30,21 @@ jobs:
 
 
   frontend:
-    name: Build Frontend
-    runs-on: ubuntu-latest
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-        working-directory: ./pfeFinal-master
+    - name: Install dependencies
+      run: npm install --legacy-peer-deps
+      working-directory: ./pfeFinal-master
 
-      - name: Build Angular
-        run: npm run build -- --configuration production
-        working-directory: ./pfeFinal-master
+    - name: Build
+      run: npm run build
+      working-directory: ./pfeFinal-master
+
