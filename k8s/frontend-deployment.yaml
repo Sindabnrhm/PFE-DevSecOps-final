@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pfe-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pfe-frontend
+  template:
+    metadata:
+      labels:
+        app: pfe-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: pfe-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80

@@ -1,0 +1,40 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: mysql-pfe
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pfe
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./pfeFinalBack-master   # 👈 C’EST ICI
+      dockerfile: Dockerfile
+    container_name: pfe-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./pfeFinal-master
+      dockerfile: Dockerfile
+    container_name: pfe-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

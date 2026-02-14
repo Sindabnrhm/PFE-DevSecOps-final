@@ -1,0 +1,271 @@
+<div class="container-fluid">
+    <div class="row">
+      <ng-template #content role="document" let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title mt-0">Changement de rôle</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-hidden="true"
+            (click)="modal.dismiss('Cross click')"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="roleForm">
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3" >
+                  <label class="control-label">Role</label>
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    formControlName="role_id"
+                   
+                  >
+                    <option value="2 ">RH</option>
+                    <option value="1">CHEF</option>
+                    <option value="3">UTILISATEUR</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="btn-save-event"
+              (click)="updatRole()"
+              style="float: right;"
+            >
+              Enregistrer
+            </button>
+          </form>
+        </div>
+      </ng-template>
+  
+      <ng-template #contentt role="document" let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title mt-0">Changement de mot de passe</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-hidden="true"
+            (click)="modal.dismiss('Cross click')"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="userForm">
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="control-label">Nouveau mot de passe</label>
+                  <input type="text" class="form-control" formControlName="password"/>
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="btn-save-event"
+              style="float: right;"
+              (click)="updatePass()"
+            >
+            Enregistrer
+            </button>
+          </form>
+        </div>
+      </ng-template>
+      <ng-template #modif role="document" let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title mt-0">Utilisateur</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-hidden="true"
+            (click)="modal.dismiss('Cross click')"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="userForm">
+            <div class="row">
+              <div class="col-12">
+                <div class="row">
+                    <div class="col-12">
+                      <div class="mb-3">
+                        <label class="control-label">Email</label>
+                        <input type="text" class="form-control" formControlName="email"/>
+                      </div>
+                      <div class="mb-3">
+                        <label class="control-label">Matricule</label>
+                        <input type="text" class="form-control" formControlName="matriculeP"/>
+                      </div>
+                      <div class="mb-3">
+                        <label class="control-label">Nom</label>
+                        <input type="text" class="form-control" formControlName="nom"/>
+                      </div>
+                      <div class="mb-3">
+                        <label class="control-label">Prenom</label>
+                        <input type="text" class="form-control" formControlName="prenom"/>
+                      </div>
+                      <div class="mb-3">
+                        <label class="control-label">numTel</label>
+                        <input type="text" class="form-control" formControlName="numTel"/>
+                      </div>
+                      <!-- <div class="mb-3" formGroupName="serv">
+                        <label class="control-label">Service</label>
+                        <input type="text" class="form-control" formControlName="idService"/>
+                      </div> -->
+                      <div class="mb-3" formGroupName="serv">
+                        <label class="control-label">Service</label>
+                        <select
+                          class="form-select"
+                          aria-label="Default select example"
+                          formControlName="idService"
+                        >
+                          <option
+                            *ngFor="let i of serv"
+                            value="{{ i.idService }}"
+                          >
+                            {{ i.lib_serv }}
+                          </option>
+                        </select>
+                      </div>
+                      
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="btn-save-event"
+              (click)="updateUser()"
+              style="float: right;"
+            >
+              Enregistrer
+            </button>
+          </form>
+        </div>
+      </ng-template>
+      <div class="card-body p-4">
+        <div class="search-box">
+          <div class="position-relative">
+            <input
+              type="text"
+              class="form-control rounded bg-light border-light"
+              placeholder="Rechercher .."
+              [(ngModel)]="term"
+            />
+            <i class="mdi mdi-magnify search-icon"></i>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table align-middle table-nowrap table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col" style="width: 70px">#</th>
+                      <th scope="col">Nom et prenom</th>
+                      <th scope="col">Matricule</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Service</th>
+
+                      <th scope="col">Login</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let item of list
+                          | filter : term
+                          | paginate : { itemsPerPage: 10, currentPage: p };
+                        let i = index
+                      "
+                    >
+                      <td>
+                        <div class="avatar-xs">
+                          <span class="avatar-title rounded-circle"> User </span>
+                        </div>
+                      </td>
+                      <td>
+                        <h5 class="font-size-14 mb-1">
+                          <a href="javascript: void(0);" class="text-dark"
+                            >{{ item.prenom }} {{ item.nom }}</a>
+                        </h5>
+                      </td>
+                      <td>{{ item.matriculeP }}</td>
+                      <td>
+                        <div *ngFor="let i of item.roles">
+                          <a
+                            href="javascript: void(0);"
+                            class="badge badge-soft-primary font-size-11 m-1"
+                            >{{ i.nomRole }}</a
+                          >
+                        </div>
+                      </td>
+                      <td>
+                        <div *ngIf="item.serv.lib_serv">
+                          <a
+                            href="javascript: void(0);"
+                            class="badge badge-soft-primary font-size-11 m-1"
+                            >{{ item.serv.lib_serv }}</a
+                          >
+                        </div>
+                      </td>
+                      <td>
+                        {{ item.matriculeP }}
+                      </td>
+                      <td>
+                        <ul class="list-inline font-size-20 contact-links mb-0">
+                          <li class="list-inline-item px-2">
+                            <a
+                              href="javascript: void(0);"
+                              ngbTooltip="Mettre à jour rôle"
+                              (click)="openModalRole(content, item)"
+                              ><i class="bx bx-user-circle"></i
+                            ></a>
+                          </li>
+  
+                          <li class="list-inline-item px-2">
+                            <a
+                              href="javascript: void(0);"
+                              ngbTooltip="Mettre à jour mot de passe"
+                              (click)="openModalupdatePass(contentt, item)"
+                              ><i class="bx bx-key"></i
+                            ></a>
+                          </li>
+                          <li class="list-inline-item px-2">
+                            <a
+                              href="javascript: void(0);"
+                              ngbTooltip="Mettre à jour utilisateur"
+                              (click)="openModalModif(modif, item)"
+                              ><i class="bx bx-user-circle"></i
+                            ></a>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="text-center my-3">
+                    <pagination-controls
+                      (pageChange)="p = $event"
+                    ></pagination-controls>
+                  </div>
+                </div>
+                <!-- end col-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

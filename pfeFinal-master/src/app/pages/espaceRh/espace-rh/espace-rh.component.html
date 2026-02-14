@@ -1,0 +1,167 @@
+<div class="container-fluid">
+    <!-- start page title -->
+  
+    <!-- end page title -->
+  
+    <div class="row">
+      <ng-template #content role="document" let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title mt-0">Mise à jour demande</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-hidden="true"
+            (click)="modal.dismiss('Cross click')"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="demandeForm">
+            <div class="row">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label class="control-label">Date demande</label>
+                  <input
+                    class="form-control"
+                    placeholder="Date demande"
+                    type="text"
+                    name="name"
+                    formControlName="dateCng"
+                    readonly
+                  />
+                </div>
+  
+  
+  
+  
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3" >
+                      <label class="control-label">Date début </label>
+                      <input
+                        class="form-control"
+                        placeholder="Date début"
+                        type="text"
+                        name="email"
+                        formControlName="dateDebut"
+                        readonly
+                      />
+                    </div>
+                  </div>
+  
+                  <div class="col-md-6">
+                    <div class="mb-3" >
+                      <label class="control-label">Date fin</label>
+                      <input
+                        class="form-control"
+                        placeholder="Date fin"
+                        type="text"
+                        name="email"
+                        formControlName="dateFin"
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+               
+  
+                
+  
+                
+                <div class="mb-3">
+                  <label class="control-label">Réponse Rh</label>
+  
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    formControlName="repRh"
+                  >
+                    <option value="O">Oui</option>
+                    <option value="N">Non</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-success"
+              id="btn-save-event"
+              (click)="updateDemande()"
+            >
+              Save
+            </button>
+          </form>
+        </div> 
+      </ng-template>
+  
+      <div class="card-body p-4">
+        <div class="search-box">
+          <p class="text-muted">Rechercher</p>
+          <div class="position-relative">
+            <input
+              type="text"
+              class="form-control rounded bg-light border-light"
+              placeholder="Rechercher .."
+              [(ngModel)]="term"
+            />
+            <i class="mdi mdi-magnify search-icon"></i>
+          </div>
+        </div>
+      </div>
+  
+      <div
+        class="col-xl-2 col-sm-4"
+        *ngFor="
+          let data of listDemande
+            | filter: term
+            | paginate: { itemsPerPage: 9, currentPage: p };
+          let i = index
+        "
+      >
+        <div class="card text-center">
+          <div class="card-body">
+            <!-- <div class="avatar-sm mx-auto mb-4" *ngIf="!data.image">
+                <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-16">
+                  {{data.name.charAt(0)}}
+                </span>
+              </div> -->
+  
+            <h5 class="font-size-15 mb-0">
+              <a href="javascript: void(0);" class="text-dark">{{
+                data.nom
+              }} {{
+                data.prenom
+              }} </a>
+            </h5>
+            <p class="text-muted">{{ data.typeConge.nomTypeconge }}</p>
+            <p class="text-muted">{{ data.dateCng }}</p>
+          </div>
+          <div class="card-footer bg-transparent border-top">
+            <div class="contact-links d-flex font-size-20">
+              <div class="flex-fill">
+                <a
+                  href="javascript: void(0);"
+                  ngbTooltip="Visualiser demande"
+                  (click)="openModal(content, data)"
+                  ><i class="bx bx-user-circle"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end row -->
+  
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center my-3">
+          <pagination-controls (pageChange)="p = $event"></pagination-controls>
+        </div>
+      </div>
+      <!-- end col-->
+    </div>
+    <!-- end row -->
+  </div>
+  <!-- container-fluid -->
+  

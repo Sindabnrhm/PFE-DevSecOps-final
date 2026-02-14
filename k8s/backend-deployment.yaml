@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pfe-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pfe-backend
+  template:
+    metadata:
+      labels:
+        app: pfe-backend
+    spec:
+      containers:
+        - name: backend
+          image: pfe-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/pfe
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
