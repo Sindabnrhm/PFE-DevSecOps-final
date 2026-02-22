@@ -3,11 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/TON_COMPTE/TON_REPO.git'
-            }
-        }
+       
 
         stage('Build Backend') {
             steps {
