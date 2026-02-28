@@ -29,7 +29,7 @@ jobs:
 
       - name: Build Backend
         run: |
-          cd backend
+          cd pfeFinalBack-master
           mvn clean install -DskipTests
 
       # ======================
@@ -42,12 +42,12 @@ jobs:
 
       - name: Install Frontend Dependencies
         run: |
-          cd frontend
+          cd pfeFinal-master
           npm install
 
       - name: Build Frontend
         run: |
-          cd frontend
+          cd pfeFinal-master
           npm run build
 
   sonarcloud:
