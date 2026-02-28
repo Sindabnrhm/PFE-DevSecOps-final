@@ -37,9 +37,12 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ./pfeFinalBack-master
 
-      # ✅ OWASP VERSION STABLE CORRIGÉE
+      # ✅ OWASP AVEC NVD API KEY (CORRECTION FINALE)
       - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:8.4.0:check -DskipTests -Dformat=HTML
+        run: |
+          mvn org.owasp:dependency-check-maven:8.4.0:check \
+          -Dnvd.api.key=${{ secrets.NVD_API_KEY }} \
+          -Dformat=HTML
         working-directory: ./pfeFinalBack-master
 
       - name: Build Docker Image Backend
