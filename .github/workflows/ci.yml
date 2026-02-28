@@ -37,7 +37,6 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ./pfeFinalBack-master
 
-      # ✅ OWASP AVEC NVD API KEY (CORRECTION FINALE)
       - name: OWASP Dependency Check
         run: |
           mvn org.owasp:dependency-check-maven:12.1.0:check \
@@ -47,32 +46,31 @@ jobs:
         working-directory: ./pfeFinalBack-master
 
 
+  frontend:
+    runs-on: ubuntu-latest
 
-frontend:
-  runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Setup Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: ./pfeFinal-master/package-lock.json
 
-    - name: Setup Node 18
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: ./pfeFinal-master/package-lock.json
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: ./pfeFinal-master
 
-    - name: Install Dependencies
-      run: npm install --legacy-peer-deps
-      working-directory: ./pfeFinal-master
+      - name: Skip Frontend Tests
+        run: echo "Frontend tests skipped in CI"
 
-    - name: Skip Frontend Tests
-      run: echo "Frontend tests skipped in CI"
+      - name: Build Frontend
+        run: npm run build -- --configuration production
+        working-directory: ./pfeFinal-master
 
-    - name: Build Frontend
-      run: npm run build -- --configuration production
-      working-directory: ./pfeFinal-master
-
-    - name: Build Docker Image Frontend
-      run: docker build -t username/pfe-frontend:latest .
-      working-directory: ./pfeFinal-master
+      - name: Build Docker Image Frontend
+        run: docker build -t username/pfe-frontend:latest .
+        working-directory: ./pfeFinal-master
