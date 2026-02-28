@@ -8,50 +8,49 @@ on:
 
 jobs:
 
-backend:
-  runs-on: ubuntu-latest
+  backend:
+    runs-on: ubuntu-latest
 
-  services:
-    sonarqube:
-      image: sonarqube:latest
-      ports:
-        - 9000:9000
+    services:
+      sonarqube:
+        image: sonarqube:latest
+        ports:
+          - 9000:9000
 
-  steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        cache: maven
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
 
-    - name: Wait for SonarQube to start
-      run: sleep 60
+      - name: Wait for SonarQube to start
+        run: sleep 60
 
-    - name: Build and Run Tests
-      run: mvn clean verify
-      working-directory: ./pfeFinalBack-master
+      - name: Build and Run Tests
+        run: mvn clean verify
+        working-directory: ./pfeFinalBack-master
 
-    - name: SonarQube Analysis
-      run: |
-        mvn sonar:sonar \
-        -Dsonar.projectKey=pfe-backend \
-        -Dsonar.host.url=http://localhost:9000 \
-        -Dsonar.login=admin \
-        -Dsonar.password=admin
-      working-directory: ./pfeFinalBack-master
+      - name: SonarQube Analysis
+        run: |
+          mvn sonar:sonar \
+          -Dsonar.projectKey=pfe-backend \
+          -Dsonar.host.url=http://localhost:9000 \
+          -Dsonar.login=admin \
+          -Dsonar.password=admin
+        working-directory: ./pfeFinalBack-master
 
-    - name: OWASP Dependency Check
-      run: mvn org.owasp:dependency-check-maven:check
-      working-directory: ./pfeFinalBack-master
+      - name: OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+        working-directory: ./pfeFinalBack-master
 
-    - name: Build Docker Image Backend
-      run: docker build -t username/pfe-backend:latest .
-      working-directory: ./pfeFinalBack-master
-
+      - name: Build Docker Image Backend
+        run: docker build -t username/pfe-backend:latest .
+        working-directory: ./pfeFinalBack-master
 
   frontend:
     runs-on: ubuntu-latest
@@ -67,22 +66,18 @@ backend:
           cache: 'npm'
           cache-dependency-path: ./pfeFinal-master/package-lock.json
 
-      # 🔹 Install Dependencies
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
         working-directory: ./pfeFinal-master
 
-      # 🔹 Run Frontend Tests
       - name: Run Frontend Tests
         run: npm run test -- --watch=false --browsers=ChromeHeadless
         working-directory: ./pfeFinal-master
 
-      # 🔹 Build Frontend
       - name: Build Frontend
         run: npm run build
         working-directory: ./pfeFinal-master
 
-      # 🔹 Build Docker Image Frontend
       - name: Build Docker Image Frontend
         run: docker build -t username/pfe-frontend:latest .
         working-directory: ./pfeFinal-master
