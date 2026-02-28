@@ -13,9 +13,14 @@ jobs:
 
     services:
       sonarqube:
-        image: sonarqube:latest
+        image: sonarqube:community
         ports:
           - 9000:9000
+        options: >-
+          --health-cmd="curl --silent --fail http://localhost:9000/api/system/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=20
 
     steps:
       - name: Checkout Code
@@ -28,8 +33,10 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Wait for SonarQube to start
-        run: sleep 60
+      - name: Wait for SonarQube to be ready
+        run: |
+          echo "Waiting for SonarQube..."
+          sleep 60
 
       - name: Build and Run Tests
         run: mvn clean verify
@@ -37,7 +44,7 @@ jobs:
 
       - name: SonarQube Analysis
         run: |
-          mvn sonar:sonar \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
           -Dsonar.projectKey=pfe-backend \
           -Dsonar.host.url=http://localhost:9000 \
           -Dsonar.login=admin \
@@ -51,6 +58,7 @@ jobs:
       - name: Build Docker Image Backend
         run: docker build -t username/pfe-backend:latest .
         working-directory: ./pfeFinalBack-master
+
 
   frontend:
     runs-on: ubuntu-latest
