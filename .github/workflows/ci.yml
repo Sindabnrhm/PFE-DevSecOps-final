@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI DevSecOps Pipeline
 
 on:
   push:
@@ -12,16 +12,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: maven
 
-      - name: Build with Maven
-        run: mvn clean install -DskipTests
+      # 🔹 Build + Tests
+      - name: Build and Run Tests
+        run: mvn clean verify
+        working-directory: ./pfeFinalBack-master
+
+      # 🔹 SonarQube Analysis (Qualité + SAST)
+      - name: SonarQube Analysis
+        run: |
+          mvn sonar:sonar \
+          -Dsonar.projectKey=pfe-backend \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        working-directory: ./pfeFinalBack-master
+
+      # 🔹 OWASP Dependency Check
+      - name: OWASP Dependency Check
+        run: mvn org.owasp:dependency-check-maven:check
+        working-directory: ./pfeFinalBack-master
+
+      # 🔹 Build Docker Image Backend
+      - name: Build Docker Image Backend
+        run: docker build -t username/pfe-backend:latest .
         working-directory: ./pfeFinalBack-master
 
 
@@ -29,17 +51,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node 16
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: 'npm'
+          cache-dependency-path: ./pfeFinal-master/package-lock.json
 
-      - name: Install dependencies
+      # 🔹 Install Dependencies
+      - name: Install Dependencies
         run: npm install --legacy-peer-deps
         working-directory: ./pfeFinal-master
 
-      - name: Build
+      # 🔹 Run Frontend Tests
+      - name: Run Frontend Tests
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+        working-directory: ./pfeFinal-master
+
+      # 🔹 Build Frontend
+      - name: Build Frontend
         run: npm run build
+        working-directory: ./pfeFinal-master
+
+      # 🔹 Build Docker Image Frontend
+      - name: Build Docker Image Frontend
+        run: docker build -t username/pfe-frontend:latest .
         working-directory: ./pfeFinal-master
