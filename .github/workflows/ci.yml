@@ -68,7 +68,7 @@ jobs:
         run: echo "Frontend tests skipped in CI"
 
       - name: Build Frontend
-        run: npm run build -- --configuration production
+        run: npm run build
         working-directory: ./pfeFinal-master
 
       - name: Build Docker Image Frontend
