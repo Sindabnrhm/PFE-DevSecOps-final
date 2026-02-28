@@ -37,8 +37,9 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ./pfeFinalBack-master
 
+      # ✅ OWASP VERSION STABLE CORRIGÉE
       - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
+        run: mvn org.owasp:dependency-check-maven:8.4.0:check -DskipTests -Dformat=HTML
         working-directory: ./pfeFinalBack-master
 
       - name: Build Docker Image Backend
