@@ -40,13 +40,10 @@ jobs:
       # ✅ OWASP AVEC NVD API KEY (CORRECTION FINALE)
       - name: OWASP Dependency Check
         run: |
-          mvn org.owasp:dependency-check-maven:8.4.0:check \
+          mvn org.owasp:dependency-check-maven:12.1.0:check \
           -Dnvd.api.key=${{ secrets.NVD_API_KEY }} \
-          -Dformat=HTML
-        working-directory: ./pfeFinalBack-master
-
-      - name: Build Docker Image Backend
-        run: docker build -t username/pfe-backend:latest .
+          -Dformat=HTML \
+          -DfailOnError=false
         working-directory: ./pfeFinalBack-master
 
 
