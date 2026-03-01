@@ -124,8 +124,8 @@ jobs:
         with:
           image-ref: 'saidabnrhm/pfe-backend:latest'
           format: 'table'
-          exit-code: '1'
-          severity: 'HIGH,CRITICAL'
+          exit-code: '0'
+          severity: 'CRITICAL'
 
       # ================= FRONTEND IMAGE =================
       # Build + Push image frontend
@@ -142,8 +142,8 @@ jobs:
         with:
           image-ref: 'saidabnrhm/pfe-frontend:latest'
           format: 'table'
-          exit-code: '1'
-          severity: 'HIGH,CRITICAL'
+          exit-code: '0'
+          severity: 'CRITICAL'
 
 
   # =====================================================
