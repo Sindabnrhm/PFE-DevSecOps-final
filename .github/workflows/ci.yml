@@ -6,18 +6,20 @@ on:
 
 jobs:
 
-  # =========================
-  # CI - BACKEND
-  # =========================
+  # =====================================================
+  #  CI - BACKEND (Build + Test + Analyse Sécurité)
+  # =====================================================
   backend:
     runs-on: ubuntu-latest
 
     steps:
+      # Récupération du code
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # Configuration Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -25,10 +27,12 @@ jobs:
           java-version: '17'
           cache: maven
 
+      # Compilation + Tests unitaires
       - name: Build and Run Tests
         run: mvn clean verify
         working-directory: ./pfeFinalBack-master
 
+      # Analyse qualité de code avec SonarCloud
       - name: SonarCloud Scan (Backend)
         run: |
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
@@ -38,6 +42,7 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         working-directory: ./pfeFinalBack-master
 
+      # Scan des dépendances vulnérables (OWASP)
       - name: OWASP Dependency Check
         run: |
           mvn org.owasp:dependency-check-maven:12.1.0:check \
@@ -47,16 +52,18 @@ jobs:
         working-directory: ./pfeFinalBack-master
 
 
-  # =========================
-  # CI - FRONTEND
-  # =========================
+  # =====================================================
+  #  CI - FRONTEND (Build Angular/React + Vérification)
+  # =====================================================
   frontend:
     runs-on: ubuntu-latest
 
     steps:
+      # Récupération du code
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Configuration Node.js
       - name: Setup Node 16
         uses: actions/setup-node@v4
         with:
@@ -64,44 +71,54 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./pfeFinal-master/package-lock.json
 
+      # Installation des dépendances
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
         working-directory: ./pfeFinal-master
 
+      # (Optionnel) Tests Frontend
       - name: Skip Frontend Tests
         run: echo "Frontend tests skipped in CI"
 
+      # Build de l'application Frontend
       - name: Build Frontend
         run: npm run build
         working-directory: ./pfeFinal-master
 
 
-  cd:
-    runs-on: self-hosted
+  # =====================================================
+  #  BUILD + PUSH +  TRIVY SECURITY SCAN (LINUX)
+  # =====================================================
+  build-and-scan:
+    runs-on: ubuntu-latest
     needs: [backend, frontend]
 
     steps:
+      # Récupération du code
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Configuration Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Connexion à DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Debug Secret
-        run: echo Username=${{ secrets.DOCKER_USERNAME }}
-
+      # ================= BACKEND IMAGE =================
+      # Build + Push image backend
       - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./pfeFinalBack-master
           push: true
           tags: saidabnrhm/pfe-backend:latest
+
+      # Scan sécurité backend avec Trivy
       - name: Scan Backend Image with Trivy
         uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -109,7 +126,9 @@ jobs:
           format: 'table'
           exit-code: '1'
           severity: 'HIGH,CRITICAL'
-          
+
+      # ================= FRONTEND IMAGE =================
+      # Build + Push image frontend
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
@@ -117,5 +136,27 @@ jobs:
           push: true
           tags: saidabnrhm/pfe-frontend:latest
 
+      # Scan sécurité frontend avec Trivy
+      - name: Scan Frontend Image with Trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: 'saidabnrhm/pfe-frontend:latest'
+          format: 'table'
+          exit-code: '1'
+          severity: 'HIGH,CRITICAL'
+
+
+  # =====================================================
+  # DEPLOYMENT - KUBERNETES (SELF-HOSTED RUNNER)
+  # =====================================================
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-scan
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Déploiement des manifests Kubernetes
       - name: Deploy to Kubernetes
         run: kubectl apply -f k8s/
