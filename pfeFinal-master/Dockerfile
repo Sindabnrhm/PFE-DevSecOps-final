@@ -9,7 +9,6 @@ RUN npm config set fetch-retries 5 \
 
 COPY package*.json ./
 
-COPY node_modules ./node_modules
 
 COPY . .
 
