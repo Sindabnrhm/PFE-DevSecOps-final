@@ -101,11 +101,10 @@ jobs:
         with:
           context: ./pfeFinalBack-master
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/pfe-backend:latest
-
+          tags: saidabnrhm/pfe-backend:latest
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: ./pfeFinal-master
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/pfe-frontend:latest
+          tags: saidabnrhm/pfe-frontend:latest
