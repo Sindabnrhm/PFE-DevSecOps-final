@@ -8,11 +8,12 @@ RUN npm config set fetch-retries 5 \
  && npm config set fetch-retry-maxtimeout 120000
 
 COPY package*.json ./
+RUN npm install
 
 
 COPY . .
 
-RUN npm run build --prod
+RUN npm run build 
 
 
 # ===== Étape 2 : Nginx =====
