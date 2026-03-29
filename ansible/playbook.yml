@@ -4,7 +4,10 @@
   become: false   # 🔴 IMPORTANT (pas de sudo global)
 
   tasks:
-
+    
+    - name: Simple test
+      command: echo "Ansible OK"
+      
     # 🔹 Mise à jour système
     - name: Update apt cache
       apt:
