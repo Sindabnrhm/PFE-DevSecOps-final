@@ -1,6 +1,7 @@
 - hosts: localhost
   connection: local
   gather_facts: no
+  become: false   # 🔴 IMPORTANT (pas de sudo global)
 
   tasks:
 
@@ -8,12 +9,14 @@
     - name: Update apt cache
       apt:
         update_cache: yes
+      become: yes
 
     # 🔹 Installer Docker
     - name: Install Docker
       apt:
         name: docker.io
         state: present
+      become: yes
 
     # 🔹 Démarrer Docker
     - name: Start Docker
@@ -21,6 +24,7 @@
         name: docker
         state: started
         enabled: true
+      become: yes
 
     # 🔹 Ajouter utilisateur au groupe Docker
     - name: Add user to docker group
@@ -28,8 +32,9 @@
         name: "bnrhm"
         groups: docker
         append: yes
+      become: yes
 
-    # 🔹 Installer dépendances pour Kubernetes
+    # 🔹 Installer dépendances Kubernetes
     - name: Install dependencies
       apt:
         name:
@@ -38,29 +43,34 @@
           - curl
           - gnupg
         state: present
+      become: yes
 
     # 🔹 Ajouter clé Kubernetes
     - name: Add Kubernetes GPG key
       shell: |
         curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | \
         gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+      become: yes
 
     # 🔹 Ajouter repository Kubernetes
     - name: Add Kubernetes repository
       shell: |
         echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | \
         tee /etc/apt/sources.list.d/kubernetes.list
+      become: yes
 
     # 🔹 Mise à jour
     - name: Update apt cache after adding Kubernetes repo
       apt:
         update_cache: yes
+      become: yes
 
     # 🔹 Installer kubectl
     - name: Install kubectl
       apt:
         name: kubectl
         state: present
+      become: yes
 
     # 🔹 Vérifier installation
     - name: Check kubectl version

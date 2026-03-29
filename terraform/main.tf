@@ -29,6 +29,9 @@ resource "docker_container" "mysql" {
   name  = "mysql-db"
   image = docker_image.mysql.name
 
+  must_run = true
+  rm       = true
+
   env = [
     "MYSQL_ROOT_PASSWORD=root",
     "MYSQL_DATABASE=pfe_db"
@@ -58,8 +61,9 @@ resource "docker_image" "backend" {
 resource "docker_container" "backend" {
   name  = "backend-app"
   image = docker_image.backend.name
-  
-  force_remove = true
+
+  must_run = true
+  rm       = true
 
   networks_advanced {
     name = docker_network.pfe_network.name
@@ -89,6 +93,9 @@ resource "docker_image" "frontend" {
 resource "docker_container" "frontend" {
   name  = "frontend-app"
   image = docker_image.frontend.name
+
+  must_run = true
+  rm       = true
 
   ports {
     internal = 80
