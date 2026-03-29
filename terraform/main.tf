@@ -58,6 +58,8 @@ resource "docker_image" "backend" {
 resource "docker_container" "backend" {
   name  = "backend-app"
   image = docker_image.backend.name
+  
+  force_remove = true
 
   networks_advanced {
     name = docker_network.pfe_network.name

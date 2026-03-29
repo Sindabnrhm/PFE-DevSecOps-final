@@ -1,5 +1,6 @@
-- hosts: servers
-  become: true
+- hosts: localhost
+  connection: local
+  gather_facts: no
 
   tasks:
 
@@ -38,19 +39,19 @@
           - gnupg
         state: present
 
-    # 🔹 Ajouter clé Kubernetes (nouvelle méthode)
+    # 🔹 Ajouter clé Kubernetes
     - name: Add Kubernetes GPG key
       shell: |
         curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | \
         gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
 
-    # 🔹 Ajouter repository Kubernetes (nouveau)
+    # 🔹 Ajouter repository Kubernetes
     - name: Add Kubernetes repository
       shell: |
         echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | \
         tee /etc/apt/sources.list.d/kubernetes.list
 
-    # 🔹 Mise à jour après ajout repo
+    # 🔹 Mise à jour
     - name: Update apt cache after adding Kubernetes repo
       apt:
         update_cache: yes
@@ -61,7 +62,7 @@
         name: kubectl
         state: present
 
-    # 🔹 Vérifier installation kubectl
+    # 🔹 Vérifier installation
     - name: Check kubectl version
       command: kubectl version --client
       register: kubectl_output
