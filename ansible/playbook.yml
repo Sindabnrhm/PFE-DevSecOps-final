@@ -7,12 +7,10 @@
     
     - name: Simple test
       command: echo "Ansible OK"
-      
+
     # 🔹 Mise à jour système
     - name: Update apt cache
-      apt:
-        update_cache: yes
-      become: yes
+      shell: apt update
 
     # 🔹 Installer Docker
     - name: Install Docker
