@@ -1,82 +1,45 @@
 - hosts: localhost
   connection: local
   gather_facts: no
-  become: false   # 🔴 IMPORTANT (pas de sudo global)
+  become: false
 
   tasks:
-    
+
     - name: Simple test
-      command: echo "Ansible OK"
+      command: echo "Ansible OK ✅"
 
-    # 🔹 Mise à jour système
-    - name: Update apt cache
-      shell: apt update
+    # 🔹 Vérifier Docker
+    - name: Check Docker version
+      command: docker --version
+      register: docker_version
 
-    # 🔹 Installer Docker
-    - name: Install Docker
-      apt:
-        name: docker.io
-        state: present
-      become: yes
+    - name: Show Docker version
+      debug:
+        var: docker_version.stdout
 
-    # 🔹 Démarrer Docker
-    - name: Start Docker
-      service:
-        name: docker
-        state: started
-        enabled: true
-      become: yes
+    # 🔹 Vérifier containers
+    - name: Check running containers
+      command: docker ps
+      register: containers
 
-    # 🔹 Ajouter utilisateur au groupe Docker
-    - name: Add user to docker group
-      user:
-        name: "bnrhm"
-        groups: docker
-        append: yes
-      become: yes
+    - name: Show containers
+      debug:
+        var: containers.stdout
 
-    # 🔹 Installer dépendances Kubernetes
-    - name: Install dependencies
-      apt:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
-        state: present
-      become: yes
+    # 🔹 Vérifier images
+    - name: Check Docker images
+      command: docker images
+      register: images
 
-    # 🔹 Ajouter clé Kubernetes
-    - name: Add Kubernetes GPG key
-      shell: |
-        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | \
-        gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
-      become: yes
+    - name: Show images
+      debug:
+        var: images.stdout
 
-    # 🔹 Ajouter repository Kubernetes
-    - name: Add Kubernetes repository
-      shell: |
-        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /" | \
-        tee /etc/apt/sources.list.d/kubernetes.list
-      become: yes
-
-    # 🔹 Mise à jour
-    - name: Update apt cache after adding Kubernetes repo
-      apt:
-        update_cache: yes
-      become: yes
-
-    # 🔹 Installer kubectl
-    - name: Install kubectl
-      apt:
-        name: kubectl
-        state: present
-      become: yes
-
-    # 🔹 Vérifier installation
-    - name: Check kubectl version
+    # 🔹 Vérifier Kubernetes (si installé)
+    - name: Check kubectl
       command: kubectl version --client
       register: kubectl_output
+      ignore_errors: yes
 
     - name: Show kubectl version
       debug:
