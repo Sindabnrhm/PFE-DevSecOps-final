@@ -4,7 +4,7 @@ export const environment = {
   // 👉 AJOUT IMPORTANT
   apiUrl: 'https://pfe-backend-latest-1.onrender.com',
 
-  defaultauth: 'fackbackend',
+  defaultauth: 'backend',
 
   firebaseConfig: {
     apiKey: '',
