@@ -11,13 +11,13 @@ RUN npm run build
 
 FROM nginx:alpine
 
-# 🔥 IMPORTANT : supprimer config par défaut
+# ❌ supprimer config par défaut
 RUN rm /etc/nginx/conf.d/default.conf
 
-# 🔥 copier ton config
+# ✅ ajouter ta config Angular
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 🔥 copier build Angular
+# ✅ copier build Angular
 COPY --from=build /app/dist/skote /usr/share/nginx/html
 
 EXPOSE 80
