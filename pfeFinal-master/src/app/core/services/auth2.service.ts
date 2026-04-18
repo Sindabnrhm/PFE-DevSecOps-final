@@ -1,25 +1,26 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-const AUTH_API = 'http://localhost:8080/api/auth/';
 
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class Auth2Service {
 
+  // 👉 URL backend Render
+  private API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
-  login(body:any): Observable<any> {
-    return this.http.post("http://localhost:8080/api/auth/signin", body, httpOptions);
+  // ✅ REGISTER
+  register(user: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/api/auth/signup`, user);
   }
-  //'api/auth/signupt'
 
-  register(body:any): Observable<any> {
-    return this.http.post(AUTH_API + 'signup', body, httpOptions);
+  // ✅ LOGIN
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/api/auth/signin`, credentials);
   }
 }
