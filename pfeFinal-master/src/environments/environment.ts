@@ -1,8 +1,7 @@
 export const environment = {
   production: false,
 
-  // 👉 AJOUT IMPORTANT
-  apiUrl: 'https://pfe-backend-latest-1.onrender.com',
+  apiUrl: 'https://pfe-backend-latest-1.onrender.com/api/auth', // ✅ CORRIGÉ
 
   defaultauth: 'backend',
 
