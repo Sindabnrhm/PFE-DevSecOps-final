@@ -1,8 +1,8 @@
+# ===== Étape 1 : Build Angular =====
 FROM node:16-alpine AS build
 
 WORKDIR /app
 
-# config npm pour éviter timeout
 RUN npm config set fetch-retries 5 \
  && npm config set fetch-retry-mintimeout 20000 \
  && npm config set fetch-retry-maxtimeout 120000
@@ -12,10 +12,19 @@ RUN npm ci --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build 
+RUN npm run build
 
 
 # ===== Étape 2 : Nginx =====
 FROM nginx:alpine
+
+# ⚠️ IMPORTANT : copier le build Angular
 COPY --from=build /app/dist/skote /usr/share/nginx/html
-EXPOSE 80
+
+# ✅ IMPORTANT : config nginx (corrige 404 Angular)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# ⚠️ IMPORTANT pour Render
+EXPOSE 10000
+
+CMD ["nginx", "-g", "daemon off;"]
