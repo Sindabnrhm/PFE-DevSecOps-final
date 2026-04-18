@@ -1,66 +1,39 @@
 import { Injectable } from '@angular/core';
-
-import { getFirebaseBackend } from '../../authUtils';
-
-import { User } from '../models/auth.models';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-
 export class AuthenticationService {
 
-    user: User;
+  private API_URL = environment.apiUrl;
 
-    constructor() {
-    }
+  constructor(private http: HttpClient) {}
 
-    /**
-     * Returns the current user
-     */
-    public currentUser(): User {
-        return getFirebaseBackend().getAuthenticatedUser();
-    }
+  /**
+   * LOGIN → backend Spring Boot
+   */
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(this.API_URL + '/api/auth/signin', {
+      username: email,   // ⚠️ adapte si backend attend autre chose
+      password: password
+    });
+  }
 
-    /**
-     * Performs the auth
-     * @param email email of user
-     * @param password password of user
-     */
-    login(email: string, password: string) {
-        return getFirebaseBackend().loginUser(email, password).then((response: any) => {
-            const user = response;
-            return user;
-        });
-    }
+  /**
+   * REGISTER
+   */
+  register(email: string, password: string): Observable<any> {
+    return this.http.post(this.API_URL + '/api/auth/signup', {
+      username: email,
+      password: password
+    });
+  }
 
-    /**
-     * Performs the register
-     * @param email email
-     * @param password password
-     */
-    register(email: string, password: string) {
-        return getFirebaseBackend().registerUser(email, password).then((response: any) => {
-            const user = response;
-            return user;
-        });
-    }
-
-    /**
-     * Reset password
-     * @param email email
-     */
-    resetPassword(email: string) {
-        return getFirebaseBackend().forgetPassword(email).then((response: any) => {
-            const message = response.data;
-            return message;
-        });
-    }
-
-    /**
-     * Logout the user
-     */
-    logout() {
-        // logout the user
-        getFirebaseBackend().logout();
-    }
+  /**
+   * LOGOUT
+   */
+  logout() {
+    localStorage.removeItem('user');
+  }
 }
-
