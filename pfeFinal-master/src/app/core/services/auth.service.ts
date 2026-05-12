@@ -11,11 +11,11 @@ export class AuthenticationService {
   constructor(private http: HttpClient) {}
 
   /**
-   * LOGIN → backend Spring Boot
+   * LOGIN
    */
   login(email: string, password: string): Observable<any> {
     return this.http.post(this.API_URL + '/api/auth/signin', {
-      username: email,   // ⚠️ adapte si backend attend autre chose
+      username: email,
       password: password
     });
   }
@@ -27,6 +27,22 @@ export class AuthenticationService {
     return this.http.post(this.API_URL + '/api/auth/signup', {
       username: email,
       password: password
+    });
+  }
+
+  /**
+   * CURRENT USER
+   */
+  currentUser() {
+    return JSON.parse(localStorage.getItem('user') || '{}');
+  }
+
+  /**
+   * RESET PASSWORD
+   */
+  resetPassword(email: string): Observable<any> {
+    return this.http.post(this.API_URL + '/api/auth/reset-password', {
+      email: email
     });
   }
 
