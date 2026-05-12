@@ -13,30 +13,39 @@ import { environment } from '../../../../environments/environment';
 })
 export class Recoverpwd2Component implements OnInit {
 
-   // set the currenr year
-   year: number = new Date().getFullYear();
+  // set the current year
+  year: number = new Date().getFullYear();
 
-   resetForm: FormGroup;
-   submitted = false;
-   error = '';
-   success = '';
-   loading = false;
+  resetForm: FormGroup;
+  submitted = false;
+  error = '';
+  success = '';
+  loading = false;
 
-   constructor(private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService) { }
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) { }
 
   ngOnInit(): void {
+
     this.resetForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
   }
 
   // convenience getter for easy access to form fields
-  get f() { return this.resetForm.controls; }
+  get f() {
+    return this.resetForm.controls;
+  }
 
   /**
    * On submit form
    */
   onSubmit() {
+
     this.success = '';
     this.submitted = true;
 
@@ -44,11 +53,19 @@ export class Recoverpwd2Component implements OnInit {
     if (this.resetForm.invalid) {
       return;
     }
+
     if (environment.defaultauth === 'firebase') {
-      this.authenticationService.resetPassword(this.f.email.value)
-        .catch(error => {
-          this.error = error ? error : '';
-        });
+
+      this.authenticationService
+        .resetPassword(this.f.email.value)
+        .subscribe(
+          (res: any) => {
+            this.success = 'Password reset email sent successfully';
+          },
+          error => {
+            this.error = error ? error : '';
+          }
+        );
     }
   }
 
@@ -63,5 +80,5 @@ export class Recoverpwd2Component implements OnInit {
         items: 1
       },
     }
-  }
+  };
 }

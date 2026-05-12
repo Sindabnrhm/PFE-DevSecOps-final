@@ -22,11 +22,15 @@ export class PasswordresetComponent implements OnInit, AfterViewInit {
   success = '';
   loading = false;
 
-  // set the currenr year
+  // set the current year
   year: number = new Date().getFullYear();
 
-  // tslint:disable-next-line: max-line-length
-  constructor(private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService) { }
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService
+  ) { }
 
   ngOnInit() {
 
@@ -39,12 +43,15 @@ export class PasswordresetComponent implements OnInit, AfterViewInit {
   }
 
   // convenience getter for easy access to form fields
-  get f() { return this.resetForm.controls; }
+  get f() {
+    return this.resetForm.controls;
+  }
 
   /**
    * On submit form
    */
   onSubmit() {
+
     this.success = '';
     this.submitted = true;
 
@@ -52,11 +59,19 @@ export class PasswordresetComponent implements OnInit, AfterViewInit {
     if (this.resetForm.invalid) {
       return;
     }
+
     if (environment.defaultauth === 'firebase') {
-      this.authenticationService.resetPassword(this.f.email.value)
-        .catch(error => {
-          this.error = error ? error : '';
-        });
+
+      this.authenticationService
+        .resetPassword(this.f.email.value)
+        .subscribe(
+          (res: any) => {
+            this.success = 'Password reset email sent successfully';
+          },
+          error => {
+            this.error = error ? error : '';
+          }
+        );
     }
   }
 }

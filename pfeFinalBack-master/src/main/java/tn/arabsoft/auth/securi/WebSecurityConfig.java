@@ -20,49 +20,58 @@ import tn.arabsoft.auth.security.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-    // securedEnabled = true,
-    // jsr250Enabled = true,
-    prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	  UserDetailsServiceImpl userDetailsService;
 
-	  @Autowired
-	  private AuthEntryPointJwt unauthorizedHandler;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
-	  @Bean
-	  public AuthTokenFilter authenticationJwtTokenFilter() {
-	    return new AuthTokenFilter();
-	  }
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
-	  @Override
-	  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-	    authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-	  }
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
-	  @Bean
-	  @Override
-	  public AuthenticationManager authenticationManagerBean() throws Exception {
-	    return super.authenticationManagerBean();
-	  }
+    @Override
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }
 
-	  @Bean
-	  public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
-	  }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-	  @Override
-	  protected void configure(HttpSecurity http) throws Exception {
-	    http.cors().and().csrf().disable()
-	      .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-	      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-	      .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-	      .antMatchers("/conge/**").permitAll()
-	      .antMatchers("/service/**").permitAll()
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	      .anyRequest().authenticated();
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-	    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-	  }
-	}
+        http.cors().and().csrf().disable()
+            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            
+            .authorizeRequests()
+            
+            // ✅ IMPORTANT : autoriser la racine
+            .antMatchers("/").permitAll()
+            
+            // ✅ routes publiques
+            .antMatchers("/api/auth/**").permitAll()
+            .antMatchers("/conge/**").permitAll()
+            .antMatchers("/service/**").permitAll()
+
+            // 🔒 le reste sécurisé
+            .anyRequest().authenticated();
+
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+}

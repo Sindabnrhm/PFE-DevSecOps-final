@@ -20,27 +20,32 @@ import { environment } from '../../../../environments/environment';
  */
 export class Login2Component implements OnInit {
 
-  constructor(private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
-    private authFackservice: AuthfakeauthenticationService) { }
+  constructor(
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService,
+    private authFackservice: AuthfakeauthenticationService
+  ) { }
+
   loginForm: FormGroup;
   submitted = false;
   error = '';
   returnUrl: string;
 
-  // set the currenr year
+  // set the current year
   year: number = new Date().getFullYear();
 
   ngOnInit(): void {
-    document.body.classList.add('auth-body-bg')
+
+    document.body.classList.add('auth-body-bg');
+
     this.loginForm = this.formBuilder.group({
       email: ['admin@themesbrand.com', [Validators.required, Validators.email]],
       password: ['123456', [Validators.required]],
     });
 
-    // reset login status
-    // this.authenticationService.logout();
     // get return url from route parameters or default to '/'
-    // tslint:disable-next-line: no-string-literal
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
@@ -55,39 +60,50 @@ export class Login2Component implements OnInit {
         items: 1
       },
     }
-  }
+  };
 
   // convenience getter for easy access to form fields
-  get f() { return this.loginForm.controls; }
+  get f() {
+    return this.loginForm.controls;
+  }
 
   /**
    * Form submit
    */
   onSubmit() {
+
     this.submitted = true;
 
     // stop here if form is invalid
     if (this.loginForm.invalid) {
       return;
-    } else {
-      if (environment.defaultauth === 'firebase') {
-        this.authenticationService.login(this.f.email.value, this.f.password.value).then((res: any) => {
-          this.router.navigate(['/dashboard']);
-        })
-          .catch(error => {
+    }
+
+    if (environment.defaultauth === 'firebase') {
+
+      this.authenticationService
+        .login(this.f.email.value, this.f.password.value)
+        .subscribe(
+          (res: any) => {
+            this.router.navigate(['/dashboard']);
+          },
+          error => {
             this.error = error ? error : '';
-          });
-      } else {
-        this.authFackservice.login(this.f.email.value, this.f.password.value)
-          .pipe(first())
-          .subscribe(
-            data => {
-              this.router.navigate(['/dashboard']);
-            },
-            error => {
-              this.error = error ? error : '';
-            });
-      }
+          }
+        );
+
+    } else {
+
+      this.authFackservice.login(this.f.email.value, this.f.password.value)
+        .pipe(first())
+        .subscribe(
+          data => {
+            this.router.navigate(['/dashboard']);
+          },
+          error => {
+            this.error = error ? error : '';
+          }
+        );
     }
   }
 }
